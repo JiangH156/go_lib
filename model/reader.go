@@ -1,12 +1,32 @@
 package model
 
+import (
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
+
+// Reader
+// @Description:
 type Reader struct {
-	ReaderId string `readerId` varchar(50)   NOT NULL,
-	ReaderName string `readerName` varchar(10)   DEFAULT NULL,
-	Password string	`password` varchar(50)   DEFAULT NULL,
-	`phone` varchar(25)   DEFAULT NULL,
-	`borrowTimes` bigint(0) DEFAULT NULL,
-	`ovdTimes` bigint(0) DEFAULT NULL,
-	`email` varchar(255)   DEFAULT NULL,
-	//姓名、密码、联系电话、借阅次数、逾期次数和电子邮箱
+	ReaderId    string `json:"readerId" gorm:"type:varchar(36);primaryKey;"`
+	ReaderName  string `json:"readerName" gorm:"type:varchar(10);not null"`
+	Password    string `json:"password" gorm:"type:varchar(50);not null"`
+	Phone       string `json:"phone" gorm:"type:varchar(25);not null"`
+	BorrowTimes uint   `json:"borrowTimes"`
+	OvdTimes    uint   `json:"ovdTimes"`
+	Email       string `json:"email" gorm:"type:varchar(255);"`
+}
+
+// BeforeCreate
+// @Description 钩子函数：插入数据前生成uuid
+// @Author zhangxinmin 2023-04-13 21:20:08 ${time}
+// @Param tx
+// @Return err
+func (r *Reader) BeforeCreate(tx *gorm.DB) (err error) {
+	uid, err := uuid.NewUUID()
+	if err != nil {
+		return err
+	}
+	r.ReaderId = uid.String()
+	return nil
 }
