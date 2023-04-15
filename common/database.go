@@ -9,8 +9,6 @@ import (
 	"net/url"
 )
 
-var DB *gorm.DB
-
 func InitDB() {
 	username := viper.GetString("datasource.username")
 	password := viper.GetString("datasource.password")
@@ -37,6 +35,8 @@ func InitDB() {
 	DB.AutoMigrate(&model.Comment{})
 
 }
+
+var DB *gorm.DB
 func GetDB() *gorm.DB {
 	return DB
 }

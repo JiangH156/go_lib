@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"net/http"
 	"os"
 )
 
@@ -23,20 +22,6 @@ func main() {
 
 	// 路由收集
 	r = CollectRoute(r)
-	r.POST("/login", func(c *gin.Context) {
-		phone := c.PostForm("phone")
-		password := c.PostForm("password")
-		isAdmin := c.PostForm("isAdmin")
-
-		fmt.Println(isAdmin)
-		// 输出 admin 对象看看是否成功
-		fmt.Println(phone, password, isAdmin)
-
-		c.JSON(http.StatusOK, gin.H{
-			"msg":    "登录成功",
-			"status": 200,
-		})
-	})
 
 	port := viper.GetString("server.port")
 	if port != "" {

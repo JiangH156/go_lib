@@ -10,8 +10,8 @@ import (
 type Reader struct {
 	ReaderId    string `json:"readerId" gorm:"type:varchar(36);primaryKey;"`
 	ReaderName  string `json:"readerName" gorm:"type:varchar(10);not null"`
-	Password    string `json:"password" gorm:"type:varchar(50);not null"`
-	Phone       string `json:"phone" gorm:"type:varchar(25);not null"`
+	Password    string `json:"password" gorm:"type:varchar(255);not null"`
+	Phone       string `json:"phone" gorm:"type:varchar(25);not null;unique"`
 	BorrowTimes uint   `json:"borrowTimes"`
 	OvdTimes    uint   `json:"ovdTimes"`
 	Email       string `json:"email" gorm:"type:varchar(255);"`
