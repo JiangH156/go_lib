@@ -16,5 +16,28 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.POST("/login", userController.Login)
 	r.POST("/register", userController.Register)
 
+	// book
+	bookController := controller.NewBookController()
+	r.POST("/books", bookController.QueryBooks)
+	r.POST("/searchbook", bookController.QueryBook)
+
+	// comment
+	commentController := controller.NewCommentController()
+	r.POST("/comments", commentController.QueryComments)
+
+	// reader
+	readerController := controller.NewReaderController()
+	r.POST("/initreader", readerController.QueryReader)
+
+	// borrow
+	borrowController := controller.NewBorrowController()
+	r.POST("/addborrow", borrowController.AddBorrow)
+
+	// reserve
+	reserveController := controller.NewReserveController()
+	r.POST("/addreserve", reserveController.AddReserve)
+	r.POST("/reserve", reserveController.QueryReserveByReaderId)
+	r.POST("/cancelreserve", reserveController.DeleteReserve)
+
 	return r
 }

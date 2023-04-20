@@ -30,13 +30,15 @@ func InitDB() {
 	DB = db
 	DB.AutoMigrate(&model.Admin{})
 	DB.AutoMigrate(&model.Book{})
-	DB.AutoMigrate(&model.Borrow{})
 	DB.AutoMigrate(&model.Reader{})
+	DB.AutoMigrate(&model.Reserve{})
 	DB.AutoMigrate(&model.Comment{})
+	DB.AutoMigrate(&model.Borrow{})
 
 }
 
 var DB *gorm.DB
+
 func GetDB() *gorm.DB {
 	return DB
 }

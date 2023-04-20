@@ -10,8 +10,12 @@ type Comment struct {
 	CommentId string `json:"commentId" gorm:"type:varchar(50);primary_key"`
 	// 评论人的唯一标识
 	ReaderId string `json:"readerId" gorm:"type:varchar(36)"`
+	// 外键关联
+	//Reader `gorm:"foreignKey:ReaderId;references:ReaderId"`
 	// 被评论书籍的唯一标识
 	BookId string `json:"bookId" gorm:"type:varchar(50)"`
+	// 外键关联
+	//Book `gorm:"foreignKey:BookId;references:BookId"`
 	// 评论日期
 	Date Time `json:"date"`
 	// 评论内容

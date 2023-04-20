@@ -13,12 +13,8 @@ import (
 // @Param code 前端自定义状态码
 // @Param data 数据
 // @Param msg 信息
-func Response(ctx *gin.Context, httpStatus int, status int, data gin.H, msg string) {
-	ctx.JSON(httpStatus, gin.H{
-		"status": status,
-		"data":   data,
-		"msg":    msg,
-	})
+func Response(ctx *gin.Context, httpStatus int, data gin.H) {
+	ctx.JSON(httpStatus, data)
 }
 
 // Success
@@ -27,8 +23,8 @@ func Response(ctx *gin.Context, httpStatus int, status int, data gin.H, msg stri
 // @Param ctx
 // @Param data
 // @Param msg
-func Success(ctx *gin.Context, data gin.H, msg string) {
-	Response(ctx, http.StatusOK, 200, data, msg)
+func Success(ctx *gin.Context, data gin.H) {
+	Response(ctx, http.StatusOK, data)
 }
 
 // Fail
@@ -37,6 +33,6 @@ func Success(ctx *gin.Context, data gin.H, msg string) {
 // @Param ctx
 // @Param data
 // @Param msg
-func Fail(ctx *gin.Context, data gin.H, msg string) {
-	Response(ctx, http.StatusBadRequest, 400, data, msg)
+func Fail(ctx *gin.Context, data gin.H) {
+	Response(ctx, http.StatusBadRequest, data)
 }
