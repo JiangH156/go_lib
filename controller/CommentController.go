@@ -1,29 +1,32 @@
 package controller
 
 import (
-	"Go_lib/common"
-	"Go_lib/model"
+	"Go_lib/response"
+	"Go_lib/service"
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 type CommentController struct {
-	DB *gorm.DB
 }
 
-// QueryComments
+// GetComments
 // @Description 查询所有评论
 // @Author John 2023-04-16 15:21:07
 // @Param ctx
-func (c *CommentController) QueryComments(ctx *gin.Context) {
-	var comments = []model.Comment{}
+func (c *CommentController) GetComments(ctx *gin.Context) {
+	commentService := service.NewCommentService()
 
 	//c.DB.Preload("Reader").Preload("Book").Find(&comments)
-	c.DB.
-		Select("readers.email, comments.status, comment_id,comments.reader_id,comments.book_id,comments.reader_id, readers.reader_name,books.book_name, date, content, praise").
-		Joins("left join readers on readers.reader_id = comments.reader_id").
-		Joins("left join books on books.book_id = comments.reader_id").
-		Find(&comments)
+	comments, lError := commentService.GetComments()
+	if lError != nil {
+		fmt.Println(lError.Err)
+		response.Response(ctx, lError.HttpCode, gin.H{
+			"status": lError.HttpCode,
+			"msg":    lError.Msg,
+		})
+		return
+	}
 	ctx.JSON(200, gin.H{
 		"msg":    "评论区请求成功",
 		"status": 200,
@@ -36,7 +39,5 @@ func (c *CommentController) QueryComments(ctx *gin.Context) {
 // @Author John 2023-04-16 15:22:58
 // @Return CommentController
 func NewCommentController() CommentController {
-	return CommentController{
-		DB: common.GetDB(),
-	}
+	return CommentController{}
 }
