@@ -48,6 +48,6 @@ func ParseTime(dateStr string) (model.Time, error) {
 
 	//设置保存精度为秒
 	//addTime.Truncate(time.Second)
-	fmt.Println(addTime)
+	//fmt.Println(addTime)
 	return model.Time(addTime), nil
 }

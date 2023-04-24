@@ -2,7 +2,7 @@ package vo
 
 import "Go_lib/model"
 
-type ReserveVO struct {
+type ReserveVo struct {
 	ReaderId string     `json:"readerId"`
 	BookId   string     `json:"bookId"`
 	Status   string     `json:"status"`

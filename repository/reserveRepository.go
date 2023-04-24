@@ -17,76 +17,103 @@ type ReserveRepository struct {
 // @Author John 2023-04-20 14:40:35
 // @Param addReserve
 // @Return error
-func (r *ReserveRepository) CreateReserveRecord(addReserve model.Reserve) error {
-	// 开启事务
-	tx := r.DB.Begin()
+func (r *ReserveRepository) CreateReserveRecord(tx *gorm.DB, addReserve model.Reserve) error {
 	if err := tx.Create(&addReserve).Error; err != nil {
 		fmt.Println("添加预约记录失败")
 		// 出错回滚
-		tx.Rollback()
 		return err
 	}
-	// 数据插入成功,提交事务
-	tx.Commit()
 	return nil
 }
 
-// GetReserveVOsByReaderId
+// GetReserveVosByReaderId
 // @Description 根据readerID查询ReserveVO
 // @Author John 2023-04-20 22:06:08
 // @Param readerId
 // @Return []vo.ReserveVO
 // @Return error
-func (r *ReserveRepository) GetReserveVOsByReaderId(readerId string) (reserveVOs []vo.ReserveVO, err error) {
+func (r *ReserveRepository) GetReserveVosByReaderId(readerId string) (reserveVos []vo.ReserveVo, err error) {
 	err = r.DB.
 		Table("reserves").
 		Select(`reserves.reader_id, books.book_id, reserves.status, books.author, books.book_name, reserves.date`).
 		Joins(`JOIN books ON reserves.book_id = books.book_id`).
 		Where(`reserves.reader_id = ?`, readerId).
-		Scan(&reserveVOs).
+		Scan(&reserveVos).
 		Error
 	if err != nil {
 		return nil, err
 	}
-	return reserveVOs, nil
+	return reserveVos, nil
 }
 
-// GetReserveByReaderIDAndBookID
-// @Description  根据readerID和bookId查询Reserve
+// GetReserveById
+// @Description  根据id查询Reserve
 // @Author John 2023-04-20 22:10:51
 // @Param readerId
 // @Param bookId
 // @Return reserve
 // @Return err
-func (r *ReserveRepository) GetReserveByReaderIDAndBookID(readerId, bookId string) (reserve model.Reserve, err error) {
-	err = r.DB.Where("reader_id = ?", readerId).Where("book_id = ?", bookId).First(&reserve).Error
+func (r *ReserveRepository) GetReserveById(id string) (reserve model.Reserve, err error) {
+	err = r.DB.Where("id = ?", id).First(&reserve).Error
 	if err != nil {
 		return reserve, err
 	}
 	return reserve, nil
 }
 
-// DeleteReserveRecord
+// DeleteReserveRecordById
 // @Description 删除预约记录
 // @Author John 2023-04-20 14:43:27
 // @Param bookId
 // @Param readerId
 // @Param date
 // @Return error
-func (r *ReserveRepository) DeleteReserveRecord(bookId string, readerId string, date model.Time) error {
-	//开启事务
-	tx := r.DB.Begin()
-	if err := tx.Where("book_id = ?", bookId).
-		Where("reader_id = ?", readerId).
-		Where("date = ?", date).
+func (r *ReserveRepository) DeleteReserveRecordById(tx *gorm.DB, id string) error {
+	if err := tx.Where("id = ?", id).
 		Delete(&model.Reserve{}).
 		Error; err != nil {
-		//删除失败
-		tx.Rollback()
 		return err
 	}
-	tx.Commit()
 	return nil
+}
+
+// UpdateStatus
+// @Description 更新预约记录状态
+// @Author John 2023-04-21 20:14:50
+// @Param tx
+// @Param reserve
+// @Param status
+// @Return error
+func (r *ReserveRepository) UpdateStatus(tx *gorm.DB, reserve model.Reserve, status string) error {
+	return tx.
+		Model(model.Reserve{}).
+		Where("reader_id = ?", reserve.ReaderId).
+		Where("book_id = ?", reserve.BookId).
+		Where("date = ?", reserve.Date).
+		UpdateColumn("status", status).
+		Error
+}
+
+// GetReserveId
+// @Description 获取id
+// @Author John 2023-04-24 16:09:58
+// @Param readerId
+// @Param bookId
+// @Param date
+// @Return id
+// @Return err
+func (r *ReserveRepository) GetReserveId(readerId string, bookId string, date model.Time) (id string, err error) {
+	if err = r.DB.
+		Model(&model.Reserve{}).
+		Select("id").
+		Where("reader_id = ?", readerId).
+		Where("book_id = ?", bookId).
+		Where("date = ?", date).
+		Scan(&id).
+		Error; err != nil {
+		return id, err
+	}
+	return id, nil
 }
 
 func NewReserveRepository() ReserveRepository {

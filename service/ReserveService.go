@@ -30,10 +30,19 @@ func (r *ReserveService) CreateReserveRecord(addReserve model.Reserve) (lErr *co
 			Err:      errors.New("预约失败"),
 		}
 	}
+	// 获取id
+	id, err := reserveRepository.GetReserveId(addReserve.ReaderId, addReserve.BookId, addReserve.Date)
+	if err != nil {
+		return &common.LError{
+			HttpCode: http.StatusInternalServerError,
+			Msg:      "新增预约记录失败",
+			Err:      errors.New("获取id失败"),
+		}
+	}
 
 	// 验证数据库是否已经存在该预约
-	reserve, _ := reserveRepository.GetReserveByReaderIDAndBookID(addReserve.ReaderId, addReserve.BookId)
-	if reserve.Id != "" {
+	//reserve, _ := reserveRepository.GetReserveByReaderIDAndBookID(addReserve.ReaderId, addReserve.BookId)
+	if id != "" {
 		fmt.Println("预约记录已存在")
 		return &common.LError{
 			HttpCode: http.StatusInternalServerError,
@@ -42,14 +51,17 @@ func (r *ReserveService) CreateReserveRecord(addReserve model.Reserve) (lErr *co
 		}
 	}
 
-	if err := reserveRepository.CreateReserveRecord(addReserve); err != nil {
+	tx := r.DB.Begin()
+	if err := reserveRepository.CreateReserveRecord(tx, addReserve); err != nil {
 		fmt.Println(err)
+		tx.Rollback()
 		return &common.LError{
 			HttpCode: http.StatusInternalServerError,
 			Msg:      "新增预约记录失败",
 			Err:      errors.New("新增预约记录失败"),
 		}
 	}
+	tx.Commit()
 	return nil
 }
 
@@ -59,19 +71,19 @@ func (r *ReserveService) CreateReserveRecord(addReserve model.Reserve) (lErr *co
 // @Param readerId
 // @Return reserveVOs
 // @Return lErr
-func (r *ReserveService) GetReserves(readerId string) (reserveVOs []vo.ReserveVO, lErr *common.LError) {
+func (r *ReserveService) GetReserves(readerId string) (reserveVos []vo.ReserveVo, lErr *common.LError) {
 	var reserveRepository = repository.NewReserveRepository()
 	if readerId == "" {
-		return reserveVOs, &common.LError{
+		return reserveVos, &common.LError{
 			HttpCode: http.StatusBadRequest,
 			Msg:      "查询预约记录失败",
 			Err:      errors.New("readerId为空"),
 		}
 	}
 
-	reserveVOs, err := reserveRepository.GetReserveVOsByReaderId(readerId)
+	reserveVos, err := reserveRepository.GetReserveVosByReaderId(readerId)
 	if err != nil {
-		return reserveVOs, &common.LError{
+		return reserveVos, &common.LError{
 			HttpCode: http.StatusInternalServerError,
 			Msg:      "读者请求预约记录失败",
 			Err:      errors.New("读者请求预约记录失败"),
@@ -79,15 +91,15 @@ func (r *ReserveService) GetReserves(readerId string) (reserveVOs []vo.ReserveVO
 	}
 
 	//查询数据为空
-	if len(reserveVOs) == 0 {
+	if len(reserveVos) == 0 {
 		fmt.Println("读者请求预约记录为空")
-		return reserveVOs, &common.LError{
+		return reserveVos, &common.LError{
 			HttpCode: http.StatusBadRequest,
 			Msg:      "读者请求预约记录为空",
 			Err:      errors.New("读者请求预约记录为空"),
 		}
 	}
-	return reserveVOs, nil
+	return reserveVos, nil
 }
 
 // DeleteReserveRecord
@@ -97,13 +109,25 @@ func (r *ReserveService) GetReserves(readerId string) (reserveVOs []vo.ReserveVO
 // @Return lErr
 func (r *ReserveService) DeleteReserveRecord(delReserve model.Reserve) (lErr *common.LError) {
 	reserveRepository := repository.NewReserveRepository()
-	if err := reserveRepository.DeleteReserveRecord(delReserve.BookId, delReserve.ReaderId, delReserve.Date); err != nil {
+	// 获取id
+	id, err := reserveRepository.GetReserveId(delReserve.ReaderId, delReserve.BookId, delReserve.Date)
+	if err != nil {
+		return &common.LError{
+			HttpCode: http.StatusInternalServerError,
+			Msg:      "新增预约记录失败",
+			Err:      errors.New("获取id失败"),
+		}
+	}
+	tx := r.DB.Begin()
+	if err := reserveRepository.DeleteReserveRecordById(tx, id); err != nil {
+		tx.Rollback()
 		return &common.LError{
 			HttpCode: http.StatusBadRequest,
 			Msg:      "取消预约失败",
 			Err:      errors.New("取消预约失败"),
 		}
 	}
+	tx.Commit()
 	return nil
 }
 

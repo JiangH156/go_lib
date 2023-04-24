@@ -19,7 +19,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	// book
 	bookController := controller.NewBookController()
 	r.POST("/books", bookController.GetBooks)
-	r.POST("/searchbook", bookController.GetBookInfo)
+	r.POST("/searchbook", bookController.GetBooksByName)
 
 	// comment
 	commentController := controller.NewCommentController()
@@ -32,6 +32,9 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	// borrow
 	borrowController := controller.NewBorrowController()
 	r.POST("/addborrow", borrowController.CreateBorrowRecord)
+	r.POST("/borrows", borrowController.GetBorrows)
+	r.POST("/returnbook", borrowController.ReturnBook)
+	r.POST("/continueborrow", borrowController.RenewBook)
 
 	// reserve
 	reserveController := controller.NewReserveController()

@@ -1,4 +1,4 @@
 package vo
 
-type CommentVO struct {
+type CommentVo struct {
 }

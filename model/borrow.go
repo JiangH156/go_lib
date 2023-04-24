@@ -1,5 +1,10 @@
 package model
 
+import (
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
+
 // Borrow
 // @Description:
 type Borrow struct {
@@ -12,10 +17,19 @@ type Borrow struct {
 	//Book `gorm:"foreignKey:BookId;references:BookId"`
 	// 借阅日期
 	BorrowDate Time `json:"borrowDate"`
-	// 应归还日期
+	// 截止日期
 	ReturnDate Time `json:"ReturnDate"`
 	// 实际归还日期
-	RealData Time `json:"RealData"`
-	// 借阅状态:借出中、已归还、逾期未还
+	RealDate Time `json:"RealDate"`
+	// 借阅状态:借出中、已归还、逾期未还、逾期归还
 	Status string `json:"status" gorm:"type:varchar(255)"`
+}
+
+func (r *Borrow) BeforeCreate(tx *gorm.DB) (err error) {
+	uid, err := uuid.NewUUID()
+	if err != nil {
+		return err
+	}
+	r.Id = uid.String()
+	return nil
 }

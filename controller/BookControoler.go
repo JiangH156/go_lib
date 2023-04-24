@@ -34,11 +34,11 @@ func (b *BookController) GetBooks(ctx *gin.Context) {
 	})
 }
 
-// GetBookInfo
+// GetBooksByName
 // @Description 查询书籍
 // @Author John 2023-04-18 15:33:55
 // @Param ctx
-func (b *BookController) GetBookInfo(ctx *gin.Context) {
+func (b *BookController) GetBooksByName(ctx *gin.Context) {
 	bookService := service.NewBookService()
 	name := ctx.PostForm("name")
 	// name为空，跳转到QueryBooks
@@ -46,7 +46,7 @@ func (b *BookController) GetBookInfo(ctx *gin.Context) {
 		ctx.Redirect(http.StatusFound, "/books")
 		ctx.Abort()
 	}
-	books, lErr := bookService.GetBook(name)
+	books, lErr := bookService.GetBookByName(name)
 	// 查询出错
 	if lErr != nil {
 		fmt.Println(lErr.Err)

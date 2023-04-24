@@ -1,19 +1,16 @@
 package controller
 
 import (
-	"Go_lib/common"
 	"Go_lib/model"
 	"Go_lib/response"
 	"Go_lib/service"
 	"Go_lib/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"net/http"
 )
 
 type ReserveController struct {
-	DB *gorm.DB
 }
 
 // CreateReserveRecord
@@ -137,7 +134,5 @@ func (r *ReserveController) DeleteReserveRecord(ctx *gin.Context) {
 	})
 }
 func NewReserveController() ReserveController {
-	return ReserveController{
-		DB: common.GetDB(),
-	}
+	return ReserveController{}
 }

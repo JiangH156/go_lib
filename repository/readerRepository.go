@@ -22,6 +22,31 @@ func (r *ReaderRepository) GetReaderByReaderId(readerId string) (*model.Reader, 
 	return &reader, err
 }
 
+// UpdateReaderBorrowTimes
+// @Description 更新借阅次数
+// @Author John 2023-04-21 15:40:41
+// @Param tx
+// @Param readerId
+func (r *ReaderRepository) UpdateReaderBorrowTimes(tx *gorm.DB, readerId string, count int) error {
+	return tx.Model(&model.Reader{}).Where("reader_id = ?", readerId).UpdateColumn("borrow_times", gorm.Expr("borrow_times + ?", count)).Error
+}
+
+// UpdateReaderOvdTimes
+// @Description 更新逾期记录
+// @Author John 2023-04-23 22:01:09
+// @Param tx
+// @Param readerId
+func (r *ReaderRepository) UpdateReaderOvdTimes(tx *gorm.DB, readerId string) error {
+	if err := tx.
+		Model(&model.Reader{}).
+		Where("reader_id = ?", readerId).
+		UpdateColumn("ovd_times", gorm.Expr("ovd_times + ?", 1)).
+		Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func NewReaderRepository() ReaderRepository {
 	return ReaderRepository{
 		DB: common.GetDB(),

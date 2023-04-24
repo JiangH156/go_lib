@@ -19,7 +19,9 @@ type BookService struct {
 // @Return []model.Book
 // @Return *common.LError
 func (b *BookService) GetBooks() (books []model.Book, lErr *common.LError) {
-	if err := b.DB.Find(&books).Error; err != nil {
+	bookRepository := repository.NewBookRepository()
+	books, err := bookRepository.GetBooks()
+	if err != nil {
 		return books, &common.LError{
 			HttpCode: http.StatusInternalServerError,
 			Msg:      "书籍查询失败",
@@ -37,10 +39,10 @@ func (b *BookService) GetBooks() (books []model.Book, lErr *common.LError) {
 	return books, nil
 }
 
-// GetBook
+// GetBookByName
 // @Description 查询书籍
 // @Author John 2023-04-20 20:51:57
-func (b *BookService) GetBook(bookName string) (books []model.Book, lErr *common.LError) {
+func (b *BookService) GetBookByName(bookName string) (books []model.Book, lErr *common.LError) {
 	var bookRepository = repository.NewBookRepository()
 	books, err := bookRepository.GetBooksByName(bookName)
 	// 查询出错
@@ -48,14 +50,6 @@ func (b *BookService) GetBook(bookName string) (books []model.Book, lErr *common
 		return books, &common.LError{
 			HttpCode: http.StatusInternalServerError,
 			Msg:      "查询书籍错误",
-			Err:      err,
-		}
-	}
-	// 查询数据判断是否为空
-	if len(books) == 0 {
-		return books, &common.LError{
-			HttpCode: http.StatusBadRequest,
-			Msg:      "查询书籍结果为空",
 			Err:      err,
 		}
 	}

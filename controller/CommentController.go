@@ -27,9 +27,9 @@ func (c *CommentController) GetComments(ctx *gin.Context) {
 		})
 		return
 	}
-	ctx.JSON(200, gin.H{
+	response.Success(ctx, gin.H{
+		"status": 100,
 		"msg":    "评论区请求成功",
-		"status": 200,
 		"data":   comments,
 	})
 }
