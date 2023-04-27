@@ -29,6 +29,30 @@ func (r *CommentRepository) GetCommentVos() (comments []vo.CommentVo, err error)
 	return comments, nil
 }
 
+// GetCommentCount
+// @Description 返回评论数量
+// @Author John 2023-04-25 20:06:56
+// @Return count
+// @Return err
+func (r *CommentRepository) GetCommentCount() (count int64, err error) {
+	if err = r.DB.Model(&model.Comment{}).Count(&count).Error; err != nil {
+		return count, err
+	}
+	return count, nil
+}
+
+// CreateComment
+// @Description 添加评论
+// @Author John 2023-04-25 22:19:46
+// @Param comment
+// @Return error
+func (r *CommentRepository) CreateComment(tx *gorm.DB, comment model.Comment) (err error) {
+	if err := tx.Create(&comment).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func NewCommentRepository() CommentRepository {
 	return CommentRepository{
 		DB: common.GetDB(),

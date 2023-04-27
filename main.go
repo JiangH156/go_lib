@@ -2,6 +2,7 @@ package main
 
 import (
 	"Go_lib/common"
+	"Go_lib/router"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -21,7 +22,7 @@ func main() {
 	}()
 
 	// 路由收集
-	r = CollectRoute(r)
+	r = router.CollectRoute(r)
 
 	port := viper.GetString("server.port")
 	if port != "" {

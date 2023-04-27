@@ -63,6 +63,56 @@ func (b *BookController) GetBooksByName(ctx *gin.Context) {
 	})
 }
 
+// UpdateBookInfo
+// @Description 管理员更新图书信息
+// @Author John 2023-04-27 13:08:35
+// @Param ctx
+func (b *BookController) UpdateBookInfo(ctx *gin.Context) {
+	bookId := ctx.PostForm("bookId")
+	value := ctx.PostForm("value")
+	status := ctx.PostForm("status")
+	difference := ctx.PostForm("difference")
+
+	bookService := service.NewBookService()
+	lErr := bookService.UpdateBookInfo(bookId, value, status, difference)
+	if lErr != nil {
+		fmt.Println(lErr.Err)
+		response.Response(ctx, lErr.HttpCode, gin.H{
+			"status": lErr.HttpCode,
+			"msg":    lErr.Msg,
+		})
+		return
+	}
+	response.Success(ctx, gin.H{
+		"status": 200,
+		"msg":    "查询成功",
+	})
+}
+
+// DeleteBook
+// @Description 管理员删除书籍
+// @Author John 2023-04-27 20:34:19
+// @Param ctx
+func (b *BookController) DeleteBook(ctx *gin.Context) {
+	// 数据接收
+	bookId := ctx.PostForm("bookId")
+	bookService := service.NewBookService()
+	lErr := bookService.DeleteBook(bookId)
+
+	if lErr != nil {
+		fmt.Println(lErr.Err)
+		response.Response(ctx, lErr.HttpCode, gin.H{
+			"status": lErr.HttpCode,
+			"msg":    lErr.Msg,
+		})
+		return
+	}
+	response.Success(ctx, gin.H{
+		"status": 200,
+		"msg":    "查询成功",
+	})
+}
+
 // NewBookController
 // @Description  BookController的构造器
 // @Author John 2023-04-16 15:21:28

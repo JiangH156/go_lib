@@ -1,4 +1,4 @@
-package main
+package router
 
 import (
 	"Go_lib/controller"
@@ -20,14 +20,23 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	bookController := controller.NewBookController()
 	r.POST("/books", bookController.GetBooks)
 	r.POST("/searchbook", bookController.GetBooksByName)
+	r.POST("/changebookinfo", bookController.UpdateBookInfo)
+	r.POST("/delbook", bookController.DeleteBook)
 
 	// comment
 	commentController := controller.NewCommentController()
 	r.POST("/comments", commentController.GetComments)
+	r.POST("/amount", commentController.GetCommentCount)
+	r.POST("/addcomment", commentController.CreateComment)
 
 	// reader
 	readerController := controller.NewReaderController()
 	r.POST("/initreader", readerController.GetReaderInfo)
+	r.POST("/amountmax", readerController.MaxCountReader)
+	r.POST("/delperson", readerController.DeleteReader)
+
+	// admin
+	r.POST("/initreaderlist", readerController.GetReaders)
 
 	// borrow
 	borrowController := controller.NewBorrowController()
@@ -41,6 +50,10 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.POST("/addreserve", reserveController.CreateReserveRecord)
 	r.POST("/reserve", reserveController.GetReserves)
 	r.POST("/cancelreserve", reserveController.DeleteReserveRecord)
+
+	// report
+	reportController := controller.NewReportController()
+	r.POST("/initstureport", reportController.GetReports)
 
 	return r
 }

@@ -28,6 +28,7 @@ func (r *BorrowRepository) GetBorrowsByReaderId(readerId string) (borrowVos []vo
 	if err := r.DB.
 		Table("borrows").
 		Select(`borrows.*, books.book_name, books.author`).
+		Where("reader_id = ?", readerId).
 		Joins(`left join books on books.book_id = borrows.book_id`).
 		Scan(&borrowVos).
 		Error; err != nil {
@@ -66,6 +67,7 @@ func (r *BorrowRepository) GetBorrowReturnDate(id string) (returnTime model.Time
 // @Return err
 func (r *BorrowRepository) GetBorrowId(readerId string, bookId string, borrowDate model.Time) (id string, err error) {
 	if err := r.DB.
+		//Debug().
 		Model(&model.Borrow{}).
 		Select(`id`).
 		Where("reader_id = ?", readerId).
@@ -105,6 +107,7 @@ func (r *BorrowRepository) UpdateBorrowRealDate(tx *gorm.DB, id string, realDate
 // @Return error
 func (r *BorrowRepository) UpdateBorrowStatus(tx *gorm.DB, id string, status string) error {
 	if err := tx.
+		//Debug().
 		Model(&model.Borrow{}).
 		Where("id = ?", id).
 		UpdateColumn("status", status).
@@ -131,6 +134,49 @@ func (r *BorrowRepository) GetBorrowStatus(id string) (status string, err error)
 	return status, err
 }
 
+// UpdateBorrowBorrowDate
+// @Description 更新借阅时间
+// @Author John 2023-04-24 19:17:28
+// @Param tx
+// @Param id
+// @Param borrowTime
+// @Return error
+func (r *BorrowRepository) UpdateBorrowBorrowDate(tx *gorm.DB, id string, borrowDate model.Time) error {
+	if err := tx.
+		Model(&model.Borrow{}).
+		Where("id = ?", id).
+		UpdateColumn("borrow_date", borrowDate).
+		Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+// UpdateBorrowReturnDate
+// @Description 更新借阅截止时间
+// @Author John 2023-04-24 19:24:12
+// @Param tx
+// @Param id
+// @Param returnDate
+// @Return error
+func (r *BorrowRepository) UpdateBorrowReturnDate(tx *gorm.DB, id string, returnDate model.Time) error {
+	if err := tx.Model(&model.Borrow{}).Where("id = ?", id).UpdateColumn("return_date", returnDate).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+// GetUnreturnedBorrowsByReaderId
+// @Description  返回用户未归还的借阅记录
+// @Author John 2023-04-26 22:31:11
+// @Param readerId
+// @Return err
+func (b *BorrowRepository) GetUnreturnedBorrowsByReaderId(readerId string) (borrows []model.Borrow, err error) {
+	if err = b.DB.Model(&model.Borrow{}).Where(`status != "已还"`).Where("reader_id = ?", readerId).Find(&borrows).Error; err != nil {
+		return borrows, err
+	}
+	return borrows, nil
+}
 func NewBorrowRepository() BorrowRepository {
 	return BorrowRepository{
 		DB: common.GetDB(),

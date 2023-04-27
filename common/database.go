@@ -34,6 +34,7 @@ func InitDB() {
 	DB.AutoMigrate(&model.Reserve{})
 	DB.AutoMigrate(&model.Comment{})
 	DB.AutoMigrate(&model.Borrow{})
+	DB.AutoMigrate(&model.Report{})
 
 }
 

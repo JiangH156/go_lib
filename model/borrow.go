@@ -21,7 +21,7 @@ type Borrow struct {
 	ReturnDate Time `json:"ReturnDate"`
 	// 实际归还日期
 	RealDate Time `json:"RealDate"`
-	// 借阅状态:借出中、已归还、逾期未还、逾期归还
+	// 借阅状态:借出、已还、续借
 	Status string `json:"status" gorm:"type:varchar(255)"`
 }
 

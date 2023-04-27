@@ -4,6 +4,7 @@ import (
 	"Go_lib/common"
 	"Go_lib/model"
 	"Go_lib/repository"
+	"Go_lib/utils"
 	"Go_lib/vo"
 	"errors"
 	"fmt"
@@ -76,7 +77,7 @@ func (b *BorrowService) CreateBorrowRecord(readerId, bookId string, date model.T
 		BookId:     bookId,
 		BorrowDate: date,
 		ReturnDate: model.Time(addDate),
-		Status:     "借出中",
+		Status:     "未还",
 	}
 	//fmt.Printf("%+v", addBorrow)
 	borrowRepository := repository.NewBorrowRepository()
@@ -100,7 +101,8 @@ func (b *BorrowService) CreateBorrowRecord(readerId, bookId string, date model.T
 // @Return []model.Borrow
 // @Return lErr
 func (b *BorrowService) GetBorrows(readerId string) (borrowVos []vo.BorrowVo, lErr *common.LError) {
-	if len(readerId) == 0 {
+	//fmt.Println(readerId)
+	if readerId == "" {
 		return borrowVos, &common.LError{
 			HttpCode: http.StatusBadRequest,
 			Msg:      "查询借阅记录错误",
@@ -143,6 +145,7 @@ func (b *BorrowService) ReturnBook(readerId string, bookId string, borrowDate mo
 
 	// 获取id
 	id, err := borrowRepository.GetBorrowId(readerId, bookId, borrowDate)
+	//fmt.Println(id)
 	if err != nil {
 		return &common.LError{
 			HttpCode: http.StatusInternalServerError,
@@ -155,7 +158,15 @@ func (b *BorrowService) ReturnBook(readerId string, bookId string, borrowDate mo
 	status, err := borrowRepository.GetBorrowStatus(id)
 	if err != nil {
 		return &common.LError{
-			HttpCode: http.StatusBadRequest,
+			HttpCode: http.StatusInternalServerError,
+			Msg:      "归还书籍失败",
+			Err:      errors.New("查询书籍状态失败"),
+		}
+	}
+
+	if status == "已还" {
+		return &common.LError{
+			HttpCode: http.StatusInternalServerError,
 			Msg:      "归还书籍失败",
 			Err:      errors.New("书籍已经归还"),
 		}
@@ -176,8 +187,7 @@ func (b *BorrowService) ReturnBook(readerId string, bookId string, borrowDate mo
 	// reader 判断更新逾期次数
 	// 获取借阅截止时间
 	returnTime, err := borrowRepository.GetBorrowReturnDate(id)
-	// TODO
-	fmt.Println(returnTime)
+	//fmt.Println(returnTime)
 	if err != nil {
 		tx.Rollback()
 		return &common.LError{
@@ -189,8 +199,9 @@ func (b *BorrowService) ReturnBook(readerId string, bookId string, borrowDate mo
 	nowTime := time.Now()
 	// 判断是否逾期
 	if nowTime.After(time.Time(returnTime)) {
+		//fmt.Println("逾期")
 		// 逾期
-		//status = "逾期归还"
+		//status = "逾期"
 		// 更新reader逾期记录
 		err := readerRepository.UpdateReaderOvdTimes(tx, readerId)
 		if err != nil {
@@ -226,9 +237,7 @@ func (b *BorrowService) ReturnBook(readerId string, bookId string, borrowDate mo
 		}
 	}
 	tx.Commit()
-
 	return nil
-
 }
 
 // RenewBook
@@ -246,10 +255,68 @@ func (b *BorrowService) RenewBook(readerId string, bookId string, borrowDate str
 			Err:      errors.New("数据格式有误"),
 		}
 	}
-	//添加预约表记录
-	//reserveService := NewReserveService()
+	borrowRepository := repository.NewBorrowRepository()
+	t, _ := utils.ParseTime(borrowDate)
+	date := model.Time(t)
+	//  获取id
+	id, err := borrowRepository.GetBorrowId(readerId, bookId, date)
+	if err != nil {
+		return &common.LError{
+			HttpCode: http.StatusInternalServerError,
+			Msg:      "续借图书失败",
+			Err:      errors.New("获取id失败"),
+		}
+	}
 
+	tx := b.DB.Begin()
 	//更新借阅表状态-续借
+	// 更新状态
+	status := "续借"
+	err = borrowRepository.UpdateBorrowStatus(tx, id, status)
+	if err != nil {
+		tx.Rollback()
+		return &common.LError{
+			HttpCode: http.StatusInternalServerError,
+			Msg:      "续借图书失败",
+			Err:      errors.New("更新状态失败"),
+		}
+	}
+	err = borrowRepository.UpdateBorrowStatus(tx, id, status)
+	if err != nil {
+		tx.Rollback()
+		return &common.LError{
+			HttpCode: http.StatusInternalServerError,
+			Msg:      "续借图书失败",
+			Err:      errors.New("更新状态失败"),
+		}
+	}
+
+	// 更新借阅时间，重置为当前时间
+	broDate := model.Time(utils.NowTime())
+	err = borrowRepository.UpdateBorrowBorrowDate(tx, id, broDate)
+	if err != nil {
+		tx.Rollback()
+		return &common.LError{
+			HttpCode: http.StatusInternalServerError,
+			Msg:      "续借图书失败",
+			Err:      errors.New("更新借阅时间失败"),
+		}
+	}
+
+	// 更新截止时间，重置为当前时间后一个月
+	t = utils.NowTime().AddDate(0, 1, 0)
+	retDate := model.Time(t)
+	fmt.Println(retDate)
+	err = borrowRepository.UpdateBorrowReturnDate(tx, id, retDate)
+	if err != nil {
+		tx.Rollback()
+		return &common.LError{
+			HttpCode: http.StatusInternalServerError,
+			Msg:      "续借图书失败",
+			Err:      errors.New("更新借阅时间失败"),
+		}
+	}
+	tx.Commit()
 	return nil
 }
 

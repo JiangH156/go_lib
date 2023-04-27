@@ -91,14 +91,14 @@ func (r *ReserveService) GetReserves(readerId string) (reserveVos []vo.ReserveVo
 	}
 
 	//查询数据为空
-	if len(reserveVos) == 0 {
-		fmt.Println("读者请求预约记录为空")
-		return reserveVos, &common.LError{
-			HttpCode: http.StatusBadRequest,
-			Msg:      "读者请求预约记录为空",
-			Err:      errors.New("读者请求预约记录为空"),
-		}
-	}
+	//if len(reserveVos) == 0 {
+	//	fmt.Println("读者请求预约记录为空")
+	//	return reserveVos, &common.LError{
+	//		HttpCode: http.StatusBadRequest,
+	//		Msg:      "读者请求预约记录为空",
+	//		Err:      errors.New("读者请求预约记录为空"),
+	//	}
+	//}
 	return reserveVos, nil
 }
 

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"Go_lib/model"
 	"Go_lib/response"
 	"Go_lib/service"
 	"Go_lib/utils"
@@ -21,8 +22,8 @@ func (b *BorrowController) CreateBorrowRecord(ctx *gin.Context) {
 	bookId := ctx.PostForm("bookId")
 	date := ctx.PostForm("date")
 
-	addTime, _ := utils.ParseTime(date)
-
+	t, _ := utils.ParseTime(date)
+	addTime := model.Time(t)
 	lErr := borrowService.CreateBorrowRecord(readerId, bookId, addTime)
 	if lErr != nil {
 		fmt.Println(lErr.Err)
@@ -45,7 +46,6 @@ func (b *BorrowController) CreateBorrowRecord(ctx *gin.Context) {
 func (b *BorrowController) GetBorrows(ctx *gin.Context) {
 	readerId := ctx.PostForm("readerId")
 	borrowService := service.NewBorrowService()
-
 	borrows, lErr := borrowService.GetBorrows(readerId)
 
 	if lErr != nil {
@@ -72,7 +72,9 @@ func (b *BorrowController) ReturnBook(ctx *gin.Context) {
 	bookId := ctx.PostForm("bookId")
 	readerId := ctx.PostForm("readerId")
 	borrowDate := ctx.PostForm("borrowDate")
-	date, _ := utils.ParseTime(borrowDate)
+
+	d, _ := utils.ParseTime(borrowDate)
+	date := model.Time(d)
 	lErr := borrowService.ReturnBook(readerId, bookId, date)
 	if lErr != nil {
 		fmt.Println(lErr.Err)

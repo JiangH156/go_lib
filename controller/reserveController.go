@@ -26,7 +26,8 @@ func (r *ReserveController) CreateReserveRecord(ctx *gin.Context) {
 	status := ctx.DefaultPostForm("status", "已预约")
 
 	// 格式化时间
-	addTime, err := utils.ParseTime(date)
+	t, err := utils.ParseTime(date)
+	addTime := model.Time(t)
 	if err != nil {
 		fmt.Println("时间格式化失败")
 		response.Response(ctx, http.StatusInternalServerError, gin.H{
@@ -105,7 +106,8 @@ func (r *ReserveController) DeleteReserveRecord(ctx *gin.Context) {
 	readerId := ctx.PostForm("readerId")
 	date := ctx.PostForm("date")
 
-	ddate, err := utils.ParseTime(date)
+	t, err := utils.ParseTime(date)
+	delDate := model.Time(t)
 	if err != nil {
 		fmt.Println("时间格式化失败")
 		response.Response(ctx, http.StatusInternalServerError, gin.H{
@@ -116,7 +118,7 @@ func (r *ReserveController) DeleteReserveRecord(ctx *gin.Context) {
 	delReserve := model.Reserve{
 		BookId:   bookId,
 		ReaderId: readerId,
-		Date:     ddate,
+		Date:     delDate,
 	}
 	lErr := reserveService.DeleteReserveRecord(delReserve)
 	if lErr != nil {

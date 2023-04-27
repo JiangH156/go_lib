@@ -23,6 +23,7 @@ type Comment struct {
 	// 点赞数
 	Praise uint `json:"praise"`
 	// 评论状态
+	// 1：正常  3： 删帖
 	Status uint `json:"status"`
 }
 
