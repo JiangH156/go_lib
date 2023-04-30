@@ -116,6 +116,24 @@ func (r *ReserveRepository) GetReserveId(readerId string, bookId string, date mo
 	return id, nil
 }
 
+// GetAllReserveRecords
+// @Description 管理员获取所有预约记录
+// @Author John 2023-04-28 14:55:12
+// @Return reserveVos
+// @Return lErr
+func (r *ReserveRepository) GetAllReserveRecords() (reserveVos []vo.ReserveVo, err error) {
+	if err = r.DB.
+		Table("reserves").
+		Select(`readers.reader_name, books.book_name, reserves.date, reserves.reader_id, reserves.book_id`).
+		Joins(`JOIN readers ON readers.reader_id = reserves.reader_id`).
+		Joins(`JOIN books ON books.book_id = reserves.book_id`).
+		Scan(&reserveVos).
+		Error; err != nil {
+		return reserveVos, err
+	}
+	return reserveVos, nil
+}
+
 func NewReserveRepository() ReserveRepository {
 	return ReserveRepository{
 		DB: common.GetDB(),

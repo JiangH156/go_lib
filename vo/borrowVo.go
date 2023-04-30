@@ -10,5 +10,6 @@ type BorrowVo struct {
 	BookName   string     `json:"bookName"`
 	BorrowDate model.Time `json:"borrowDate"`
 	ReturnDate model.Time `json:"returnDate"`
-	RealDate   model.Time `json:"RealDate"`
+	RealDate   model.Time `json:"realDate"`
+	ReaderName string     `json:"readerName"`
 }

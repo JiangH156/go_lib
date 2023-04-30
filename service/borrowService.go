@@ -94,13 +94,13 @@ func (b *BorrowService) CreateBorrowRecord(readerId, bookId string, date model.T
 	return nil
 }
 
-// GetBorrows
+// GetReaderBorrowRecords
 // @Description 查询借阅记录
 // @Author John 2023-04-21 23:17:19
 // @Param readerId
 // @Return []model.Borrow
 // @Return lErr
-func (b *BorrowService) GetBorrows(readerId string) (borrowVos []vo.BorrowVo, lErr *common.LError) {
+func (b *BorrowService) GetReaderBorrowRecords(readerId string) (borrowVos []vo.BorrowVo, lErr *common.LError) {
 	//fmt.Println(readerId)
 	if readerId == "" {
 		return borrowVos, &common.LError{
@@ -317,6 +317,165 @@ func (b *BorrowService) RenewBook(readerId string, bookId string, borrowDate str
 		}
 	}
 	tx.Commit()
+	return nil
+}
+
+// GetAllBorrowRecords
+// @Description 获取全部借阅记录
+// @Author John 2023-04-27 22:11:53
+// @Return borrowVos
+// @Return lErr
+func (b *BorrowService) GetAllBorrowRecords() (borrowVos []vo.BorrowVo, lErr *common.LError) {
+	borrowRepository := repository.NewBorrowRepository()
+	borrowVos, err := borrowRepository.GetAllBorrowRecords()
+
+	if err != nil {
+		return borrowVos, &common.LError{
+			HttpCode: http.StatusInternalServerError,
+			Msg:      "请求失败",
+			Err:      errors.New("获取全部借阅记录错误"),
+		}
+	}
+	return borrowVos, nil
+}
+
+// GetBorrowRecordByInfo
+// @Description 根据关键词获取相关借阅记录
+// @Author John 2023-04-27 22:50:08
+// @Param info
+// @Return borrowVos
+// @Return lErr
+func (b *BorrowService) GetBorrowRecordByInfo(info string) (borrowVos []vo.BorrowVo, lErr *common.LError) {
+	borrowRepository := repository.NewBorrowRepository()
+	borrowVos, err := borrowRepository.GetBorrowRecordByInfo(info)
+
+	if err != nil {
+		return borrowVos, &common.LError{
+			HttpCode: http.StatusInternalServerError,
+			Msg:      "请求失败",
+			Err:      errors.New("获取全部借阅记录错误"),
+		}
+	}
+	return borrowVos, nil
+}
+
+// DeleteBorrow
+// @Description 管理员删除借阅记录
+// @Author John 2023-04-27 23:06:11
+// @Param readerId
+// @Param bookId
+// @Param borrowDate
+// @Return borrowVos
+// @Return lErr
+func (b *BorrowService) DeleteBorrow(readerId, bookId, borrowDate string) (lErr *common.LError) {
+	// 数据验证
+	if readerId == "" || bookId == "" || borrowDate == "" {
+		return &common.LError{
+			HttpCode: http.StatusBadRequest,
+			Msg:      "请求失败",
+			Err:      errors.New("删除借阅记录错误"),
+		}
+	}
+	date, _ := utils.ParseTime(borrowDate)
+	delBorrow := model.Borrow{
+		ReaderId:   readerId,
+		BookId:     bookId,
+		BorrowDate: model.Time(date),
+	}
+
+	// 开启事务
+	tx := b.DB.Begin()
+	borrowRepository := repository.NewBorrowRepository()
+	err := borrowRepository.DeleteBorrow(tx, delBorrow)
+
+	if err != nil {
+		tx.Rollback()
+		return &common.LError{
+			HttpCode: http.StatusInternalServerError,
+			Msg:      "请求失败",
+			Err:      errors.New("删除借阅记录错误"),
+		}
+	}
+	tx.Commit()
+	return nil
+}
+
+// SendReminder
+// @Description 管理员提醒用户还书
+// @Author John 2023-04-28 09:47:44
+// @Param readerId
+// @Param bookName
+// @Return lErr
+func (b *BorrowService) SendReminder(readerId string, bookName string) (lErr *common.LError) {
+	// 数据验证
+	if readerId == "" || bookName == "" {
+		return &common.LError{
+			HttpCode: http.StatusBadRequest,
+			Msg:      "数据验证失败",
+			Err:      errors.New("删除借阅记录错误"),
+		}
+	}
+
+	borrowRepository := repository.NewBorrowRepository()
+	// 查询用户未归还书籍
+	borrows, err := borrowRepository.GetUnreturnedBorrowsByReaderId(readerId)
+	if err != nil {
+		return &common.LError{
+			HttpCode: http.StatusInternalServerError,
+			Msg:      "请求失败",
+			Err:      errors.New("查询用户未归还书籍错误"),
+		}
+	}
+	//fmt.Println(borrows)
+	//  用户是否归还书籍
+	if len(borrows) == 0 {
+		return &common.LError{
+			HttpCode: http.StatusBadRequest,
+			Msg:      "用户已归还书籍",
+			Err:      errors.New("用户已归还书籍"),
+		}
+	}
+	// 获取书籍id
+	bookRepository := repository.NewBookRepository()
+	bookId, err := bookRepository.GetBookIdByBookName(bookName)
+	flag := false
+	for _, b := range borrows {
+		if b.BookId == bookId {
+			// 用户未归还书籍中存在该书籍
+			flag = true
+		}
+	}
+	//  书籍已归还
+	if !flag {
+		return &common.LError{
+			HttpCode: http.StatusBadRequest,
+			Msg:      "用户已归还书籍",
+			Err:      errors.New("用户已归还书籍"),
+		}
+	}
+
+	// 获取邮箱
+	readerRepository := repository.NewReaderRepository()
+	reader, err := readerRepository.GetReaderByReaderId(readerId)
+	if err != nil {
+		return &common.LError{
+			HttpCode: http.StatusInternalServerError,
+			Msg:      "请求失败",
+			Err:      errors.New("获取邮箱失败"),
+		}
+	}
+	// 发送邮件
+	subject := "还书提醒！"
+	body := "读者您好，请尽快归还书籍:" + bookName
+	err = utils.SendEmail([]string{reader.Email}, nil, nil, subject, body, "")
+	if err != nil {
+		return &common.LError{
+			HttpCode: http.StatusInternalServerError,
+			Msg:      "请求失败",
+			Err:      errors.New("发送邮件失败"),
+		}
+	}
+
 	return nil
 }
 

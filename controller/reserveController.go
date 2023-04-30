@@ -62,11 +62,11 @@ func (r *ReserveController) CreateReserveRecord(ctx *gin.Context) {
 	})
 }
 
-// GetReserves
+// GetReserveRecords
 // @Description 获取预约信息
 // @Author John 2023-04-19 18:53:26
 // @Param ctx
-func (r *ReserveController) GetReserves(ctx *gin.Context) {
+func (r *ReserveController) GetReserveRecords(ctx *gin.Context) {
 	var reserveService = service.NewReserveService()
 	readerId := ctx.PostForm("readerId")
 	if readerId == "" {
@@ -133,6 +133,29 @@ func (r *ReserveController) DeleteReserveRecord(ctx *gin.Context) {
 	response.Success(ctx, gin.H{
 		"status": 200,
 		"msg":    "取消预约成功!",
+	})
+}
+
+// GetAllReserveRecords
+// @Description 管理员获取所有预约记录
+// @Author John 2023-04-28 14:45:03
+// @Param ctx
+func (r *ReserveController) GetAllReserveRecords(ctx *gin.Context) {
+	reserveService := service.NewReserveService()
+	reserveVos, lErr := reserveService.GetAllReserveRecords()
+	if lErr != nil {
+		fmt.Println(lErr.Err)
+		response.Response(ctx, lErr.HttpCode, gin.H{
+			"status": lErr.HttpCode,
+			"msg":    lErr.Msg,
+		})
+		return
+	}
+
+	response.Success(ctx, gin.H{
+		"status": 200,
+		"msg":    "取消预约成功!",
+		"data":   reserveVos,
 	})
 }
 func NewReserveController() ReserveController {

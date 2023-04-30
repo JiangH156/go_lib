@@ -131,6 +131,24 @@ func (r *ReserveService) DeleteReserveRecord(delReserve model.Reserve) (lErr *co
 	return nil
 }
 
+// GetAllReserveRecords
+// @Description 管理员获取所有预约记录
+// @Author John 2023-04-28 14:53:50
+// @Return reserveVos
+// @Return lErr
+func (r *ReserveService) GetAllReserveRecords() (reserveVos []vo.ReserveVo, lErr *common.LError) {
+	reserveRepository := repository.NewReserveRepository()
+	reserveVos, err := reserveRepository.GetAllReserveRecords()
+	if err != nil {
+		return reserveVos, &common.LError{
+			HttpCode: http.StatusInternalServerError,
+			Msg:      "请求失败",
+			Err:      errors.New("获取所有预约记录失败"),
+		}
+	}
+	return reserveVos, nil
+}
+
 func NewReserveService() ReserveService {
 	return ReserveService{
 		DB: common.GetDB(),

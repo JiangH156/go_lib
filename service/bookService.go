@@ -202,7 +202,7 @@ func (b *BookService) DeleteBook(bookId string) (lErr *common.LError) {
 	// 比较当前库存和总库存是否相等
 	if amount != totalAmount {
 		return &common.LError{
-			HttpCode: http.StatusInternalServerError,
+			HttpCode: http.StatusBadRequest,
 			Msg:      "当前书籍存在未归还书籍",
 			Err:      errors.New("当前书籍存在未归还书籍"),
 		}
@@ -219,6 +219,8 @@ func (b *BookService) DeleteBook(bookId string) (lErr *common.LError) {
 			Err:      errors.New("删除书籍失败"),
 		}
 	}
+	// 事务提交
+	tx.Commit()
 	return nil
 }
 

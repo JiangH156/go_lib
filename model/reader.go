@@ -19,7 +19,7 @@ type Reader struct {
 
 // BeforeCreate
 // @Description 钩子函数：插入数据前生成uuid
-// @Author zhangxinmin 2023-04-13 21:20:08 ${time}
+// @Author 2023-04-13 21:20:08
 // @Param tx
 // @Return err
 func (r *Reader) BeforeCreate(tx *gorm.DB) (err error) {

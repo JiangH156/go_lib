@@ -97,6 +97,52 @@ func (c *CommentService) CreateComment(readerId string, bookId string, content s
 	return nil
 }
 
+// UpdatePraise
+// @Description 更新点赞记录
+// @Author John 2023-04-28 16:19:30
+// @Param readerId
+// @Param bookId
+// @Param date
+// @Return lErr
+func (c *CommentService) UpdatePraise(readerId string, bookId string, date string) (lErr *common.LError) {
+	// 数据验证
+	if readerId == "" || bookId == "" || date == "" {
+		return &common.LError{
+			HttpCode: http.StatusBadRequest,
+			Msg:      "更新点赞记录失败",
+			Err:      errors.New("数据验证失败"),
+		}
+	}
+	t, _ := utils.ParseTime(date)
+	time := model.Time(t)
+
+	commentRepository := repository.NewCommentRepository()
+	// 获取commentId
+	commentId, err := commentRepository.GetCommentId(readerId, bookId, time)
+	if err != nil {
+		return &common.LError{
+			HttpCode: http.StatusBadRequest,
+			Msg:      "更新点赞记录失败",
+			Err:      errors.New("获取commentId失败"),
+		}
+	}
+
+	// 开启事务
+	tx := c.DB.Begin()
+	// 添加评论
+	err = commentRepository.UpdatePraiseByCommentId(tx, commentId)
+	if err != nil {
+		tx.Rollback()
+		return &common.LError{
+			HttpCode: http.StatusBadRequest,
+			Msg:      "添加评论失败",
+			Err:      errors.New("添加评论失败"),
+		}
+	}
+	tx.Commit()
+	return nil
+}
+
 func NewCommentService() CommentService {
 	return CommentService{
 		DB: common.GetDB(),

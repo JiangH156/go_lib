@@ -177,6 +177,60 @@ func (b *BorrowRepository) GetUnreturnedBorrowsByReaderId(readerId string) (borr
 	}
 	return borrows, nil
 }
+
+// GetAllBorrowRecords
+// @Description 获取全部借阅记录
+// @Author John 2023-04-27 22:11:58
+// @Return borrowVos
+// @Return err
+func (r *BorrowRepository) GetAllBorrowRecords() (borrowVos []vo.BorrowVo, err error) {
+	if err = r.DB.
+		Model(&model.Borrow{}).
+		Select(`borrows.reader_id, books.book_id, readers.reader_name, books.book_name, borrows.borrow_date, borrows.return_date, borrows.real_date`).
+		Joins("LEFT JOIN readers ON readers.reader_id = borrows.reader_id").
+		Joins("LEFT JOIN books ON books.book_id = borrows.book_id").
+		Scan(&borrowVos).Error; err != nil {
+		return borrowVos, err
+	}
+	return borrowVos, nil
+}
+
+// GetBorrowRecordByInfo
+// @Description 根据关键词获取相关借阅记录
+// @Author John 2023-04-27 22:51:54
+// @Param info
+// @Return borrowVos
+// @Return err
+func (r *BorrowRepository) GetBorrowRecordByInfo(info string) (borrowVos []vo.BorrowVo, err error) {
+	if err = r.DB.
+		Model(&model.Borrow{}).
+		Select(`borrows.reader_id, books.book_id, readers.reader_name, books.book_name, borrows.borrow_date, borrows.return_date, borrows.real_date`).
+		Joins("LEFT JOIN readers ON readers.reader_id = borrows.reader_id").
+		Joins("LEFT JOIN books ON books.book_id = borrows.book_id").
+		Where("readers.reader_name LIKE ? OR books.book_name LIKE ?", "%"+info+"%", "%"+info+"%").
+		Scan(&borrowVos).Error; err != nil {
+		return borrowVos, err
+	}
+	return borrowVos, nil
+}
+
+// DeleteBorrow
+// @Description 管理员删除借阅记录
+// @Author John 2023-04-27 23:13:38
+// @Param tx
+// @Param borrow
+// @Return borrowVos
+// @Return err
+func (r *BorrowRepository) DeleteBorrow(tx *gorm.DB, borrow model.Borrow) error {
+	if err := tx.
+		Where("reader_id = ? AND book_id = ? AND borrow_date = ?", borrow.ReaderId, borrow.BookId, borrow.BorrowDate).
+		Delete(&model.Borrow{}).
+		Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func NewBorrowRepository() BorrowRepository {
 	return BorrowRepository{
 		DB: common.GetDB(),

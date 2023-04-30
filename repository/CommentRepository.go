@@ -53,6 +53,43 @@ func (r *CommentRepository) CreateComment(tx *gorm.DB, comment model.Comment) (e
 	return nil
 }
 
+// GetCommentId
+// @Description 返回commnetId
+// @Author John 2023-04-28 16:21:15
+// @Param readerId
+// @Param bookId
+// @Param date
+// @Return commentId
+// @Return err
+func (r *CommentRepository) GetCommentId(readerId string, bookId string, date model.Time) (commentId string, err error) {
+	if err = r.DB.
+		Model(&model.Comment{}).
+		Select(`comment_id`).
+		Where(`reader_id = ? AND book_id = ? AND date = ?`, readerId, bookId, date).
+		Scan(&commentId).
+		Error; err != nil {
+		return commentId, err
+	}
+	return commentId, nil
+}
+
+// UpdatePraiseByCommentId
+// @Description 更新点赞记录
+// @Author John 2023-04-28 16:27:29
+// @Param tx
+// @Param commentId
+// @Return err
+func (r *CommentRepository) UpdatePraiseByCommentId(tx *gorm.DB, commentId string) (err error) {
+	if err = tx.
+		Model(&model.Comment{}).
+		Where("comment_id = ?", commentId).
+		UpdateColumn("praise", gorm.Expr("praise + ?", 1)).
+		Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func NewCommentRepository() CommentRepository {
 	return CommentRepository{
 		DB: common.GetDB(),

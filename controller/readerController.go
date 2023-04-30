@@ -43,11 +43,11 @@ func (c *ReaderController) GetReaderInfo(ctx *gin.Context) {
 	})
 }
 
-// MaxCountReader
+// GetMaxCountReader
 // @Description 获取评论最多的人员
 // @Author John 2023-04-25 21:29:09
 // @Param ctx
-func (c *ReaderController) MaxCountReader(ctx *gin.Context) {
+func (c *ReaderController) GetMaxCountReader(ctx *gin.Context) {
 	readerService := service.NewReaderService()
 	reader, lErr := readerService.MaxCountReader()
 

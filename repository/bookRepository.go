@@ -188,6 +188,18 @@ func (b *BookRepository) GetTotalAmountByBookId(bookId string) (totalAmount int,
 	return totalAmount, nil
 }
 
+// GetBookIdByBookName
+// @Description 根据书籍名称获取书籍id
+// @Author John 2023-04-30 10:33:54
+// @Param bookName
+// @Return interface{}
+func (b *BookRepository) GetBookIdByBookName(bookName string) (bookId string, err error) {
+	if err = b.DB.Model(&model.Book{}).Select(`book_id`).Where("book_name = ?", bookName).Scan(&bookId).Error; err != nil {
+		return bookId, err
+	}
+	return bookId, nil
+}
+
 func NewBookRepository() BookRepository {
 	return BookRepository{
 		DB: common.GetDB(),

@@ -39,14 +39,14 @@ func (b *BorrowController) CreateBorrowRecord(ctx *gin.Context) {
 	})
 }
 
-// GetBorrows
+// GetReaderBorrowRecords
 // @Description 获取所有借阅记录
 // @Author John 2023-04-21 23:12:12
 // @Param ctx
-func (b *BorrowController) GetBorrows(ctx *gin.Context) {
+func (b *BorrowController) GetReaderBorrowRecords(ctx *gin.Context) {
 	readerId := ctx.PostForm("readerId")
 	borrowService := service.NewBorrowService()
-	borrows, lErr := borrowService.GetBorrows(readerId)
+	borrowVos, lErr := borrowService.GetReaderBorrowRecords(readerId)
 
 	if lErr != nil {
 		fmt.Println(lErr.Err)
@@ -59,7 +59,7 @@ func (b *BorrowController) GetBorrows(ctx *gin.Context) {
 	response.Success(ctx, gin.H{
 		"status": 200,
 		"msg":    "获取借阅记录成功",
-		"data":   borrows,
+		"data":   borrowVos,
 	})
 }
 
@@ -117,10 +117,103 @@ func (b *BorrowController) RenewBook(ctx *gin.Context) {
 	})
 }
 
-// NewBorrowController
-// @Description BookController的构造器
-// @Author John 2023-04-16 15:23:25
-// @Return BookController
+// GetAllBorrowRecords
+// @Description 获取全部借阅记录
+// @Author John 2023-04-27 21:32:39
+// @Param ctx
+func (b *BorrowController) GetAllBorrowRecords(ctx *gin.Context) {
+	borrowService := service.NewBorrowService()
+	borrowVos, lErr := borrowService.GetAllBorrowRecords()
+
+	if lErr != nil {
+		fmt.Println(lErr.Err)
+		response.Response(ctx, lErr.HttpCode, gin.H{
+			"status": lErr.HttpCode,
+			"msg":    lErr.Msg,
+		})
+		return
+	}
+	response.Success(ctx, gin.H{
+		"status": 200,
+		"msg":    "获取借阅记录成功",
+		"data":   borrowVos,
+	})
+}
+
+// GetBorrowRecordByInfo
+// @Description 管理员 根据关键词获取相关借阅记录
+// @Author John 2023-04-27 22:49:00
+// @Param ctx
+func (b *BorrowController) GetBorrowRecordByInfo(ctx *gin.Context) {
+	info := ctx.PostForm("info")
+	borrowService := service.NewBorrowService()
+	borrowVos, lErr := borrowService.GetBorrowRecordByInfo(info)
+
+	if lErr != nil {
+		fmt.Println(lErr.Err)
+		response.Response(ctx, lErr.HttpCode, gin.H{
+			"status": lErr.HttpCode,
+			"msg":    lErr.Msg,
+		})
+		return
+	}
+	response.Success(ctx, gin.H{
+		"status": 200,
+		"msg":    "获取借阅记录成功",
+		"data":   borrowVos,
+	})
+}
+
+// DeleteBorrow
+// @Description 管理员删除借阅记录
+// @Author John 2023-04-27 22:58:00
+// @Param ctx
+func (b *BorrowController) DeleteBorrow(ctx *gin.Context) {
+	readerId := ctx.PostForm("readerId")
+	bookId := ctx.PostForm("bookId")
+	borrowDate := ctx.PostForm("borrowDate")
+
+	borrowService := service.NewBorrowService()
+	lErr := borrowService.DeleteBorrow(readerId, bookId, borrowDate)
+
+	if lErr != nil {
+		fmt.Println(lErr.Err)
+		response.Response(ctx, lErr.HttpCode, gin.H{
+			"status": lErr.HttpCode,
+			"msg":    lErr.Msg,
+		})
+		return
+	}
+	response.Success(ctx, gin.H{
+		"status": 200,
+		"msg":    "获取借阅记录成功",
+	})
+}
+
+// SendReminder
+// @Description 管理员提醒用户还书
+// @Author John 2023-04-28 09:45:29
+// @Param ctx
+func (b *BorrowController) SendReminder(ctx *gin.Context) {
+	readerId := ctx.PostForm("readerId")
+	bookName := ctx.PostForm("bookName")
+
+	borrowService := service.NewBorrowService()
+	lErr := borrowService.SendReminder(readerId, bookName)
+	if lErr != nil {
+		fmt.Println(lErr.Err)
+		response.Response(ctx, lErr.HttpCode, gin.H{
+			"status": lErr.HttpCode,
+			"msg":    lErr.Msg,
+		})
+		return
+	}
+	response.Success(ctx, gin.H{
+		"status": 200,
+		"msg":    "获取借阅记录成功",
+	})
+}
+
 func NewBorrowController() BorrowController {
 	return BorrowController{}
 }
