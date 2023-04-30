@@ -10,3 +10,4 @@
 
 go.sum
 go.mod
+/config/application.yml
