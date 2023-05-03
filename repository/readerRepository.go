@@ -92,6 +92,24 @@ func (r *ReaderRepository) DeleteReaderByReaderId(tx *gorm.DB, readerId string) 
 	return nil
 }
 
+// GetEmailByReaderId
+// @Description 返回email
+// @Author John 2023-05-03 20:35:28
+// @Param readerID
+// @Return email
+// @Return err
+func (r *ReaderRepository) GetEmailByReaderId(readerID string) (email string, err error) {
+	if err = r.DB.
+		Model(&model.Reader{}).
+		Select("email").
+		Where("reader_id = ?", readerID).
+		Scan(&email).
+		Error; err != nil {
+		return email, err
+	}
+	return email, nil
+}
+
 func NewReaderRepository() ReaderRepository {
 	return ReaderRepository{
 		DB: common.GetDB(),

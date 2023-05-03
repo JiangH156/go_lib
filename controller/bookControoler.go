@@ -1,11 +1,13 @@
 package controller
 
 import (
+	"Go_lib/model"
 	"Go_lib/response"
 	"Go_lib/service"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 type BookController struct {
@@ -85,7 +87,7 @@ func (b *BookController) UpdateBookInfo(ctx *gin.Context) {
 	}
 	response.Success(ctx, gin.H{
 		"status": 200,
-		"msg":    "查询成功",
+		"msg":    "更新书籍成功",
 	})
 }
 
@@ -109,7 +111,50 @@ func (b *BookController) DeleteBook(ctx *gin.Context) {
 	}
 	response.Success(ctx, gin.H{
 		"status": 200,
-		"msg":    "查询成功",
+		"msg":    "删除书籍成功",
+	})
+}
+
+// CreateBook
+// @Description 添加图书
+// @Author John 2023-05-03 16:27:29
+// @Param ctx
+func (b *BookController) CreateBook(ctx *gin.Context) {
+	bookName := ctx.PostForm("bookName")
+	author := ctx.PostForm("author")
+	amount := ctx.PostForm("amount")
+	position := ctx.PostForm("position")
+
+	Amount, err := strconv.Atoi(amount)
+	if err != nil {
+		fmt.Println("Atoi错误")
+		response.Response(ctx, http.StatusBadRequest, gin.H{
+			"status": 400,
+			"msg":    "请求错误",
+		})
+		return
+	}
+	book := model.Book{
+		BookName: bookName,
+		Amount:   uint(Amount),
+		Author:   author,
+		Position: position,
+	}
+
+	bookService := service.NewBookService()
+	lErr := bookService.CreateBook(book)
+
+	if lErr != nil {
+		fmt.Println(lErr.Err)
+		response.Response(ctx, lErr.HttpCode, gin.H{
+			"status": lErr.HttpCode,
+			"msg":    lErr.Msg,
+		})
+		return
+	}
+	response.Success(ctx, gin.H{
+		"status": 200,
+		"msg":    "添加图书成功",
 	})
 }
 

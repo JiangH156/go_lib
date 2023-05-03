@@ -412,7 +412,7 @@ func (b *BorrowService) SendReminder(readerId string, bookName string) (lErr *co
 		return &common.LError{
 			HttpCode: http.StatusBadRequest,
 			Msg:      "数据验证失败",
-			Err:      errors.New("删除借阅记录错误"),
+			Err:      errors.New("数据验证失败"),
 		}
 	}
 

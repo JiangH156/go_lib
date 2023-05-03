@@ -200,6 +200,19 @@ func (b *BookRepository) GetBookIdByBookName(bookName string) (bookId string, er
 	return bookId, nil
 }
 
+// CreateBook
+// @Description 新增书籍
+// @Author John 2023-05-03 20:15:59
+// @Param tx
+// @Param book
+// @Return error
+func (b *BookRepository) CreateBook(tx *gorm.DB, book model.Book) error {
+	if err := tx.Create(&book).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func NewBookRepository() BookRepository {
 	return BookRepository{
 		DB: common.GetDB(),

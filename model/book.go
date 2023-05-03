@@ -12,6 +12,6 @@ type Book struct {
 	TotalAmount uint `json:"totalAmount"`
 	// 借阅次数
 	BorrowedTimes uint `json:"borrowedTimes"`
-	// 状态
+	// 状态 1:可借阅 0：不可借阅
 	Status int `json:"status"`
 }

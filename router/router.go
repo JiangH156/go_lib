@@ -22,6 +22,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.POST("/searchbook", bookController.GetBooksByName)
 	r.POST("/changebookinfo", bookController.UpdateBookInfo)
 	r.POST("/delbook", bookController.DeleteBook)
+	r.POST("/adminaddbooks", bookController.CreateBook)
 
 	// comment
 	commentController := controller.NewCommentController()
@@ -59,6 +60,8 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	reportController := controller.NewReportController()
 	r.POST("/initstureport", reportController.GetReportRecords)
 	r.POST("/initreportlist", reportController.GetAllReportRecords)
+	r.POST("/reportcomment", reportController.CreateReport)
+	r.POST("/auditcomment", reportController.ManageReport)
 
 	return r
 }

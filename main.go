@@ -41,7 +41,7 @@ func InitConfig() {
 	// 配置文件所在目录
 	viper.AddConfigPath(dir + "/config")
 	// 配置文件名（不带后缀）
-	viper.SetConfigName("application_dev")
+	viper.SetConfigName("application")
 	// 配置文件类型
 	viper.SetConfigType("yml")
 	// 读取配置信息

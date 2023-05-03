@@ -186,7 +186,7 @@ func (b *BorrowController) DeleteBorrow(ctx *gin.Context) {
 	}
 	response.Success(ctx, gin.H{
 		"status": 200,
-		"msg":    "获取借阅记录成功",
+		"msg":    "请求成功",
 	})
 }
 
@@ -210,7 +210,7 @@ func (b *BorrowController) SendReminder(ctx *gin.Context) {
 	}
 	response.Success(ctx, gin.H{
 		"status": 200,
-		"msg":    "获取借阅记录成功",
+		"msg":    "请求成功",
 	})
 }
 

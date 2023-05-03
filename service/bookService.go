@@ -224,6 +224,82 @@ func (b *BookService) DeleteBook(bookId string) (lErr *common.LError) {
 	return nil
 }
 
+// CreateBook
+// @Description 新增图书
+// @Author John 2023-05-03 16:34:14
+// @Param book
+// @Return lErr
+func (b *BookService) CreateBook(book model.Book) (lErr *common.LError) {
+	// 数据验证
+	if book.BookName == "" || book.Author == "" || book.Amount == 0 || book.Position == "" {
+		return &common.LError{
+			HttpCode: http.StatusBadRequest,
+			Msg:      "请求参数有误",
+			Err:      errors.New("请求参数有误"),
+		}
+	}
+	// 限制书籍最大数量2000
+	if book.Amount > 2000 {
+		return &common.LError{
+			HttpCode: http.StatusBadRequest,
+			Msg:      "书籍数量过多",
+			Err:      errors.New("书籍数量过多"),
+		}
+	}
+
+	// 判断是否存在该书籍
+	bookRepository := repository.NewBookRepository()
+	bookId, err := bookRepository.GetBookIdByBookName(book.BookName)
+	if err != nil {
+		return &common.LError{
+			HttpCode: http.StatusInternalServerError,
+			Msg:      "请求错误",
+			Err:      errors.New("获取BookId错误"),
+		}
+	}
+	if bookId != "" {
+		return &common.LError{
+			HttpCode: http.StatusBadRequest,
+			Msg:      "新增失败，书籍已存在",
+			Err:      errors.New("新增失败，书籍已存在"),
+		}
+	}
+	// 判断该位置是否已经使用
+	getBook, err := bookRepository.GetBookByPosition(book.Position)
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return &common.LError{
+				HttpCode: http.StatusInternalServerError,
+				Msg:      "请求错误",
+				Err:      errors.New("获取指定位置书籍错误错误"),
+			}
+		}
+
+	}
+	if getBook.BookId != "" {
+		return &common.LError{
+			HttpCode: http.StatusBadRequest,
+			Msg:      "新增失败，该位置已使用",
+			Err:      errors.New("新增失败，该位置已使用"),
+		}
+	}
+
+	// 开启事务
+	tx := b.DB.Begin()
+	// 新增书籍
+	err = bookRepository.CreateBook(tx, book)
+	if err != nil {
+		tx.Rollback()
+		return &common.LError{
+			HttpCode: http.StatusInternalServerError,
+			Msg:      "请求错误",
+			Err:      errors.New("新增书籍错误"),
+		}
+	}
+	tx.Commit()
+	return nil
+}
+
 func NewBookService() BookService {
 	return BookService{
 		DB: common.GetDB(),

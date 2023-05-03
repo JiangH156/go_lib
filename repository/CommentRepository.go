@@ -90,6 +90,40 @@ func (r *CommentRepository) UpdatePraiseByCommentId(tx *gorm.DB, commentId strin
 	return nil
 }
 
+// GetReaderIdByCommentId
+// @Description 获取书名ID
+// @Author John 2023-05-03 14:55:13
+// @Param commentId
+// @Return readerId
+func (r *CommentRepository) GetReaderIdByCommentId(commentId string) (readerId string, err error) {
+	if err = r.DB.
+		Model(&model.Comment{}).
+		Select("reader_id").
+		Where("comment_id = ?", commentId).
+		Scan(&readerId).
+		Error; err != nil {
+		return readerId, err
+	}
+	return readerId, nil
+}
+
+// UpdateStatusByCommentId
+// @Description 更新Status字段
+// @Author John 2023-05-03 21:36:16
+// @Param tx
+// @Param commentId
+// @Return error
+func (r *CommentRepository) UpdateStatusByCommentId(tx *gorm.DB, commentId string, status int) error {
+	if err := tx.
+		Model(&model.Comment{}).
+		Where("comment_id = ?", commentId).
+		UpdateColumn("status", status).
+		Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func NewCommentRepository() CommentRepository {
 	return CommentRepository{
 		DB: common.GetDB(),
