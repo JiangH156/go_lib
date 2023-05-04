@@ -26,7 +26,7 @@
             <input type="tel" v-if="!isAdmin" placeholder="PhoneNumber" class="input" v-model="loginMsg.phone"/>
             <input type="tel" v-else placeholder="User" class="input" v-model="loginMsg.phone"/>
             <input type="password" placeholder="Password" class="input" v-model="loginMsg.pwd" @keydown.enter="sendLoginMsg"/>
-            <a href="#" class="link">Forgot your password?</a>
+            <!-- <a href="#" class="link">Forgot your password?</a> -->
             <el-button class="btn" @click="sendLoginMsg">Sign In</el-button>
         </form>
     </div>
@@ -194,6 +194,7 @@ export default {
                    password:this.loginMsg.pwd,
                    isAdmin:this.isAdmin
                }
+               console.log(data);
          login(qs.stringify(data)).then(res=>{
                console.log(res);
                if(res.status == 200){

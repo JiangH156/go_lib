@@ -1,3 +1,2 @@
-启动程序：npm run serve
+图书管理系统前端 取自https://github.com/Nirvana-del/library-system.git
 
-这是图书管理系统的前台仓库，如想获取后端代码，请前往[https://github.com/Nirvana-del/news-system-backend)
