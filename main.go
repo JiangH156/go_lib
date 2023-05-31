@@ -1,9 +1,9 @@
 package main
 
 import (
-	"Go_lib/common"
-	"Go_lib/router"
 	"fmt"
+	"github.com/John/Go_lib/common"
+	"github.com/John/Go_lib/router"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"os"

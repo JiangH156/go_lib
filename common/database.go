@@ -1,8 +1,8 @@
 package common
 
 import (
-	"Go_lib/model"
 	"fmt"
+	"github.com/John/Go_lib/model"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

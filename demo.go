@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Go_lib/common"
+	"github.com/John/Go_lib/utils"
 )
 
 func main() {
@@ -10,7 +10,7 @@ func main() {
 	subject := "Test"
 	body := `大聪明`
 	for t := 0; t < 5; t++ {
-		if err := common.SendEmail(
+		if err := utils.SendEmail(
 			to,
 			nil,
 			nil,

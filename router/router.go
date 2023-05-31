@@ -1,8 +1,8 @@
 package router
 
 import (
-	"Go_lib/controller"
-	"Go_lib/middleware"
+	"github.com/John/Go_lib/controller"
+	"github.com/John/Go_lib/middleware"
 	"github.com/gin-gonic/gin"
 )
 

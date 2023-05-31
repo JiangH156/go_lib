@@ -1,11 +1,11 @@
 package service
 
 import (
-	"Go_lib/common"
-	"Go_lib/model"
-	"Go_lib/repository"
-	"Go_lib/vo"
 	"errors"
+	"github.com/John/Go_lib/common"
+	"github.com/John/Go_lib/model"
+	"github.com/John/Go_lib/repository"
+	"github.com/John/Go_lib/vo"
 	"gorm.io/gorm"
 	"net/http"
 )

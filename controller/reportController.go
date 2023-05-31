@@ -1,12 +1,12 @@
 package controller
 
 import (
-	"Go_lib/model"
-	"Go_lib/response"
-	"Go_lib/service"
-	"Go_lib/utils"
-	"Go_lib/vo"
 	"fmt"
+	"github.com/John/Go_lib/model"
+	"github.com/John/Go_lib/response"
+	"github.com/John/Go_lib/service"
+	"github.com/John/Go_lib/utils"
+	"github.com/John/Go_lib/vo"
 	"github.com/gin-gonic/gin"
 )
 

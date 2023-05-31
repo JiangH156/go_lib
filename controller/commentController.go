@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"Go_lib/response"
-	"Go_lib/service"
 	"fmt"
+	"github.com/John/Go_lib/response"
+	"github.com/John/Go_lib/service"
 	"github.com/gin-gonic/gin"
 )
 

@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"Go_lib/common"
-	"Go_lib/model"
+	"github.com/John/Go_lib/common"
+	"github.com/John/Go_lib/model"
 	"gorm.io/gorm"
 )
 
