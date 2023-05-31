@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/John/Go_lib/common"
-	"github.com/John/Go_lib/router"
 	"github.com/gin-gonic/gin"
+	"github.com/jiangh156/Go_lib/common"
+	"github.com/jiangh156/Go_lib/router"
 	"github.com/spf13/viper"
 	"os"
 )

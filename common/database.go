@@ -2,7 +2,7 @@ package common
 
 import (
 	"fmt"
-	"github.com/John/Go_lib/model"
+	"github.com/jiangh156/Go_lib/model"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

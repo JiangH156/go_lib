@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/John/Go_lib/utils"
+	"github.com/jiangh156/Go_lib/utils"
 )
 
 func main() {

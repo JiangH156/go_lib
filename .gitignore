@@ -8,8 +8,7 @@
 #*.log: 忽略所有 .log 文件
 #config.php: 忽略当前路径的 config.php 文件
 
-go.sum
-go.mod
+
 config/application.yml
 .idea
 demo.go

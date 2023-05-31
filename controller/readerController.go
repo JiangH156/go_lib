@@ -2,9 +2,9 @@ package controller
 
 import (
 	"fmt"
-	"github.com/John/Go_lib/response"
-	"github.com/John/Go_lib/service"
 	"github.com/gin-gonic/gin"
+	"github.com/jiangh156/Go_lib/response"
+	"github.com/jiangh156/Go_lib/service"
 )
 
 type ReaderController struct {

@@ -1,6 +1,6 @@
 package vo
 
-import "github.com/John/Go_lib/model"
+import "github.com/jiangh156/Go_lib/model"
 
 type ReportVo struct {
 	Status       string     `json:"status"`       //状态

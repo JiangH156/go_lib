@@ -1,9 +1,9 @@
 package router
 
 import (
-	"github.com/John/Go_lib/controller"
-	"github.com/John/Go_lib/middleware"
 	"github.com/gin-gonic/gin"
+	"github.com/jiangh156/Go_lib/controller"
+	"github.com/jiangh156/Go_lib/middleware"
 )
 
 func CollectRoute(r *gin.Engine) *gin.Engine {

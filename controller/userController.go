@@ -2,12 +2,12 @@ package controller
 
 import (
 	"fmt"
-	"github.com/John/Go_lib/common"
-	"github.com/John/Go_lib/model"
-	"github.com/John/Go_lib/response"
-	"github.com/John/Go_lib/service"
-	"github.com/John/Go_lib/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/jiangh156/Go_lib/common"
+	"github.com/jiangh156/Go_lib/model"
+	"github.com/jiangh156/Go_lib/response"
+	"github.com/jiangh156/Go_lib/service"
+	"github.com/jiangh156/Go_lib/utils"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"net/http"

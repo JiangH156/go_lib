@@ -1,9 +1,9 @@
 package repository
 
 import (
-	"github.com/John/Go_lib/common"
-	"github.com/John/Go_lib/model"
-	"github.com/John/Go_lib/vo"
+	"github.com/jiangh156/Go_lib/common"
+	"github.com/jiangh156/Go_lib/model"
+	"github.com/jiangh156/Go_lib/vo"
 	"gorm.io/gorm"
 )
 
